@@ -1,4 +1,5 @@
-// const {add,multiply}=require("./math.js")
-const math = require("./math");
-console.log(math.add(12, 7));
-console.log(math.multiply(12, 3));
+import {add,multiply} from "./math.js"
+console.log(add(5,7));
+console.log(multiply(3,5));
+
+

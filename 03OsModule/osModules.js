@@ -1,4 +1,4 @@
-const os = require("os");
+import os from "os"
 
 // 1. Get the OS platform & User Info
 // Returns the operating system platform (e.g., 'win32', 'linux', 'darwin').

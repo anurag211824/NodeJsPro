@@ -307,7 +307,7 @@ Without this, the request would be halted, and the route handler wouldn’t be e
 8. Handling Errors (Invalid Token):
 javascript
 Copy code
-    } catch (error) {
+     catch (error) {
         res.status(403).json({ error: 'Invalid token' });
     }
 If the token is invalid (e.g., expired, malformed, or tampered with), an error is thrown in the jwt.verify() method.

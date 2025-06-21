@@ -1,26 +1,29 @@
-const http = require("http");
+import http from "http";
 
-//server is Eventemitter
+// Server is EventEmitter
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
-    res.setHeader("Content_type", "text/html");
-    res.write("<h1>I am anurag this is the homepage</h1>");
+    res.setHeader("Content-Type", "text/html");
+    res.write("<h1>I am Anurag, this is the homepage</h1>");
     res.end();
-  }
-  if (req.url === "/about") {
-    res.write("I am anurag a b_tech student");
+  } else if (req.url === "/about") {
+    res.setHeader("Content-Type", "text/plain");
+    res.write("I am Anurag, a B.Tech student");
     res.end();
-  }
-  if (req.url === "/contact") {
-    res.setHeader("Content_type", "text/plain");
-    res.write("I am anurag contact me on 9334759512");
+  } else if (req.url === "/contact") {
+    res.setHeader("Content-Type", "text/plain");
+    res.write("I am Anurag, contact me on 9334759512");
+    res.end();
+  } else {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "text/plain");
+    res.write("404 Not Found");
     res.end();
   }
 });
 
-//web server
-
+// Start the web server
 const PORT = 3000;
 server.listen(PORT, () => {
-  console.log(` Listening on ${PORT} 😊`);
+  console.log(`Listening on port ${PORT} 😊`);
 });

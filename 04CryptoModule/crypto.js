@@ -1,4 +1,4 @@
-const crypto=require("crypto")
+import crypto from "crypto"
 
 const randomValue=crypto.randomBytes(8).toString("hex");
 
