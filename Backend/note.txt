@@ -1,0 +1,325 @@
+project-folder/
+├── server.js            # Main entry point
+├── config/
+│   └── db.js            # Database connection setup
+├── controllers/
+│   └── authController.js # Authentication logic
+├── middleware/
+│   └── authMiddleware.js # Middleware for protected routes
+├── models/
+│   └── User.js           # User schema
+├── routes/
+│   └── authRoutes.js     # Routes for auth functionalities
+└── package.json          # Project metadata and dependencies
+
+
+What is app.use(express.json())
+
+This line is a middleware setup in Express that enables your application to parse JSON payloads in incoming HTTP requests.
+Why it's needed:
+When your application receives a request with JSON data in the body (e.g., from a POST or PUT request), Express needs to understand and convert it into a JavaScript object for you to work with it easily.
+
+How it works:
+Middleware Functionality:
+
+express.json() is a built-in middleware in Express that processes Content-Type: application/json requests.
+It parses the JSON string in the request body and makes it available as req.body.
+
+
+Explanation of models/User.js
+
+1. Require Dependencies:
+javascript
+Copy code
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+mongoose: A library used to interact with MongoDB in a more structured way. It allows defining schemas and models.
+bcrypt: A library used to hash passwords (to securely store them in the database). It provides methods to generate salt and hash the password.
+2. Defining the User Schema:
+javascript
+Copy code
+const UserSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+});
+UserSchema: A Mongoose schema defines the structure of the documents that will be stored in the users collection in the database. It includes:
+name: A string field that is required. It will store the user's name.
+email: A string field that is required and unique. This ensures no two users can have the same email.
+password: A string field that is required. It will store the user's hashed password.
+3. Password Hashing Middleware:
+javascript
+Copy code
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+UserSchema.pre('save', async function (next) {...}): This is a middleware function that runs before saving a user document to the database. The save hook ensures the logic is applied each time a user is created or updated.
+
+if (!this.isModified('password')) return next();: Checks if the password field is modified. If not, it moves on to the next operation (next()) without performing any hashing, which is efficient if other fields of the document are modified (not the password).
+const salt = await bcrypt.genSalt(10);: Generates a "salt" — a random string used to add extra complexity to the hashed password. The argument 10 specifies the number of rounds to use for generating the salt. A higher number increases security but also makes the hashing slower.
+this.password = await bcrypt.hash(this.password, salt);: Hashes the password using the salt. The bcrypt.hash() method hashes the password in a secure way, making it unreadable (it generates a hashed version of the original password).
+next();: Once the hashing is complete, it calls next() to move the process along and save the user document in the database.
+4. Exporting the Model:
+javascript
+Copy code
+module.exports = mongoose.model('User', UserSchema);
+mongoose.model('User', UserSchema): This creates a Mongoose model based on the schema (UserSchema). The model represents the users collection in MongoDB and is used to interact with the data (e.g., creating, reading, updating, or deleting users).
+module.exports: This makes the User model available for use in other parts of the application. You can import and use it in routes or controllers to interact with the users collection.
+Summary:
+Schema: Defines the structure of the users collection with name, email, and password fields.
+Password Hashing: Before saving a user, it checks if the password is modified. If it is, the password is hashed using bcrypt, and then saved.
+Export Model: The model is exported so that it can be used to interact with the users collection in MongoDB.
+Let me know if you'd like further clarification on any part!
+
+
+
+Explanation of routes/authRoutes.js
+
+
+
+1. Importing Dependencies:
+javascript
+Copy code
+const express = require('express');
+const { registerUser, loginUser, logoutUser } = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
+express: This imports the Express framework, which is used to handle routing, middleware, and server-side functionality in your Node.js application.
+registerUser, loginUser, logoutUser: These are functions imported from the authController file. They are the route handler functions responsible for processing the registration, login, and logout requests, respectively.
+authMiddleware: This is a middleware function imported from the authMiddleware file. It will be used to protect the logout route by ensuring that the user is authenticated before they can log out.
+
+
+
+Let's break down each line of the code:
+
+1. Importing Dependencies:
+javascript
+Copy code
+const express = require('express');
+const { registerUser, loginUser, logoutUser } = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
+express: This imports the Express framework, which is used to handle routing, middleware, and server-side functionality in your Node.js application.
+registerUser, loginUser, logoutUser: These are functions imported from the authController file. They are the route handler functions responsible for processing the registration, login, and logout requests, respectively.
+authMiddleware: This is a middleware function imported from the authMiddleware file. It will be used to protect the logout route by ensuring that the user is authenticated before they can log out.
+
+
+
+
+2. Creating the Router:
+javascript
+Copy code
+const router = express.Router();
+express.Router(): This creates a new Express Router instance. A router allows you to modularize your route definitions and organize them into separate files. You will associate the routes with specific HTTP methods (GET, POST, etc.) and their corresponding route handlers.
+
+
+
+3. Defining the Routes:
+javascript
+Copy code
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.get('/logout', authMiddleware, logoutUser);
+router.post('/register', registerUser);:
+This defines a POST route at the /register endpoint.
+When a request is made to /register, the registerUser function (imported from authController) will be executed to handle the request, typically creating a new user.
+router.post('/login', loginUser);:
+This defines a POST route at the /login endpoint.
+When a user sends a request to /login, the loginUser function will be executed to authenticate the user, usually by checking their credentials and generating a token (like JWT).
+router.get('/logout', authMiddleware, logoutUser);:
+This defines a GET route at /logout endpoint.
+authMiddleware: This is the middleware applied to the route. It runs before the logoutUser function and ensures the user is authenticated (e.g., checking if a valid session or token exists).
+If the user is authenticated, logoutUser will be executed, typically to log the user out (e.g., by clearing their session or invalidating their token).
+
+
+
+4. Exporting the Router:
+javascript
+Copy code
+module.exports = router;
+This line exports the router so it can be used in other parts of the application. In the main server file, this router will be imported and mounted on a specific URL path (e.g., /auth), so all the routes defined in this file will be available to handle requests.
+
+
+
+
+Explanation of controllers/authController.js
+
+
+1. registerUser function:
+javascript
+Copy code
+const registerUser = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        const user = await User.create({ name, email, password });
+        res.status(201).json({ message: 'User registered', userId: user._id });
+    } catch (error) {
+        res.status(400).json({ error: 'Registration failed', details: error.message });
+    }
+};
+Purpose: This function handles the user registration process.
+Steps:
+Extract the user's name, email, and password from the request body (req.body).
+Create a new user by calling User.create() with the provided details. The User model is assumed to handle validation and save the user in the database.
+If user creation is successful, respond with a 201 HTTP status code and a success message, along with the newly created user's userId.
+If an error occurs (like validation failure), the function responds with a 400 HTTP status code and an error message.
+
+
+
+
+2. loginUser function:
+javascript
+Copy code
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+        res.status(500).json({ error: 'Login failed', details: error.message });
+    }
+};
+Purpose: This function handles the login process for users.
+Steps:
+Extract the user's email and password from the request body (req.body).
+Search for the user in the database using the email. If no user is found, it responds with a 400 status code and an "Invalid credentials" error.
+Compare passwords: Use bcrypt.compare() to check if the entered password matches the stored, hashed password.
+If the passwords match, generate a JWT token using jwt.sign(). The token contains the user's id and is signed with a secret (process.env.JWT_SECRET) and set to expire in 1 hour.
+Respond with a 200 status code and the JWT token if login is successful.
+If there is any error (such as a database failure), the function responds with a 500 status code and an error message.
+
+
+
+
+3. logoutUser function:
+javascript
+Copy code
+const logoutUser = (req, res) => {
+    res.status(200).json({ message: 'Logout successful' });
+};
+Purpose: This function handles the user logout process.
+Steps:
+The function simply responds with a 200 HTTP status code and a success message ("Logout successful").
+This function is a placeholder since logout functionality can vary depending on how sessions or tokens are handled. Typically, logout involves clearing tokens or ending sessions, but in this case, no specific implementation is provided.
+
+
+
+
+
+Module Exports:
+javascript
+Copy code
+module.exports = { registerUser, loginUser, logoutUser };
+Exports: These three functions (registerUser, loginUser, and logoutUser) are exported as part of the module so they can be used in other parts of the application (for example, in route handlers).
+
+
+
+
+
+Explanation of controllers/authController.js
+
+
+
+
+
+1. Importing the JWT Library:
+javascript
+Copy code
+const jwt = require('jsonwebtoken');
+The jsonwebtoken library is imported to handle the creation and verification of JWT tokens. This library provides methods like jwt.verify() to validate and decode the JWT tokens.
+
+
+
+2. Middleware Function Definition:
+javascript
+Copy code
+const authMiddleware = (req, res, next) =>{}
+This defines the middleware function authMiddleware, which takes three arguments:
+req: The request object, which contains information about the incoming HTTP request.
+res: The response object, which allows the middleware to send a response back to the client.
+next: A function that calls the next middleware in the stack or the route handler.
+
+
+
+
+3. Extracting the Token from the Request:
+javascript
+Copy code
+    const token = req.headers['authorization'];
+The JWT token is typically passed in the Authorization header of the request (e.g., Authorization: Bearer <token>).
+Here, the middleware extracts the token using: req.headers['authorization'].
+
+
+
+
+4. Checking if the Token is Present:
+javascript
+Copy code
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+If no token is provided in the Authorization header, the middleware immediately responds with:
+401 Unauthorized status code.
+An error message: { error: 'Unauthorized' }.
+This means that the user is not authenticated and cannot access the route.
+
+
+
+
+
+5. Verifying the Token:
+javascript
+Copy code
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    }
+If the token is present, the middleware attempts to verify it using jwt.verify().
+The token is passed as the first argument.
+The JWT secret key (process.env.JWT_SECRET) is passed as the second argument to verify the token’s authenticity.
+If the token is valid, it will be decoded, meaning it will reveal any information embedded in it (e.g., the user's ID).
+
+
+
+6. Attaching the Decoded User Information:
+javascript
+Copy code
+        req.user = decoded;
+Once the token is successfully decoded, the middleware adds the decoded information (such as the user ID) to the req.user object.
+This makes the user data available to other middleware functions or route handlers, allowing them to access the authenticated user's details.
+
+
+
+7. Calling the next() Function:
+javascript
+Copy code
+        next();
+After the user’s data is attached to the request (req.user), the middleware calls the next() function.
+This allows the request to continue and pass to the next middleware in the stack or the route handler.
+Without this, the request would be halted, and the route handler wouldn’t be executed.
+
+
+
+8. Handling Errors (Invalid Token):
+javascript
+Copy code
+    } catch (error) {
+        res.status(403).json({ error: 'Invalid token' });
+    }
+If the token is invalid (e.g., expired, malformed, or tampered with), an error is thrown in the jwt.verify() method.
+The catch block handles this error and responds with:
+403 Forbidden status code.
+An error message: { error: 'Invalid token' }
+
+
+
+9. Exporting the Middleware:
+javascript
+Copy code
+module.exports = authMiddleware;
+The middleware function is exported so it can be used in other files or routes.
+This allows the middleware to be applied to specific routes that need protection, ensuring that only authenticated users can access them.
