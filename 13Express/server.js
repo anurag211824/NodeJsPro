@@ -21,7 +21,9 @@ const data = await response.json();                           // Parsing JSON re
 //console.log(data); // Output the fetched data to console
 
 // ✅ Serve static files (like HTML, CSS, JS, images) from "public" folder
-//app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({extended:true}))
+//app.use(express.json())
 // Optional: app.use("/public", express.static(path.join(__dirname, "public")));
 // The above line will serve static files with /public prefix (e.g., /public/style.css)
 
@@ -59,6 +61,27 @@ app.get("/product", (req, res) => {
   res.send(`<h1>user searched for product ${req.query.page} ${req.query.limit}</h1>`);
 });
 
+
+// form submission in node js
+app.get("/contact", (req, res) => {
+  console.log("Form submitted:", req.query);
+  setTimeout(() => {
+    // res.redirect("/");
+    res.send("okkkk")
+    // form jab submit hoga na to aise hoga url me ye show karega
+    // http://localhost:3000/contact?name=Anurag+kumar&email=ak0666666%40gmail.com&message=Hiiii%0D%0A
+  }, 1000);
+});
+
+app.post("/contact", (req, res) => {
+  console.log("Form submitted:", req.body);
+  setTimeout(() => {
+    // res.redirect("/");
+    res.send("okkk")
+    // form jab submit hoga na to aise hoga url me ye show karega
+    // http://localhost:3000/contact?name=Anurag+kumar&email=ak0666666%40gmail.com&message=Hiiii%0D%0A
+  }, 1000);
+});
 // ✅ Start server on specified PORT
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
