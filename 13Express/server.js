@@ -34,9 +34,9 @@ app.get("/", (req, res) => {
 });
 
 // GET "/about" => Return simple HTML string
-app.get("/about", (req, res) => {
-  return res.send("<h1>Hello about</h1>");
-});
+// app.get("/about", (req, res) => {
+//   return res.send("<h1>Hello about</h1>");
+// });
 
 //Route parameter in express js
 app.get("/profile/:username",(req,res)=>{
@@ -51,6 +51,13 @@ app.get("/profile/:username/article/:slug",(req,res)=>{
   res.send(`<h1>Article ${req.params.username} ${formattedSlug}</h1>`)
   
 })
+
+// Query parameters in express js
+
+app.get("/product", (req, res) => {
+  console.log(req.query);
+  res.send(`<h1>user searched for product ${req.query.page} ${req.query.limit}</h1>`);
+});
 
 // ✅ Start server on specified PORT
 app.listen(PORT, () => {
