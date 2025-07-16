@@ -82,6 +82,12 @@ app.post("/contact", (req, res) => {
     // http://localhost:3000/contact?name=Anurag+kumar&email=ak0666666%40gmail.com&message=Hiiii%0D%0A
   }, 1000);
 });
+
+// How to handle a 404 error page in express js
+app.use((req,res)=>{
+    return res.status(400).sendFile(path.join(__dirname,"views","404.html"));
+})
+
 // ✅ Start server on specified PORT
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);

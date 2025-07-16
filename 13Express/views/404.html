@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Error Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #ff416c, #090909);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    .error-container {
+      max-width: 500px;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .error-code {
+      font-size: 6rem;
+      font-weight: bold;
+    }
+
+    .error-message {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .error-description {
+      font-size: 1rem;
+      color: #ffe8e8;
+      margin-bottom: 1.5rem;
+    }
+
+    .home-button {
+      padding: 0.75rem 1.5rem;
+      background-color: white;
+      color: #ff416c;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .home-button:hover {
+      background-color: #ffe4ec;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-code">404</div>
+    <div class="error-message">Oops! Page not found</div>
+    <div class="error-description">
+      The page you’re looking for doesn’t exist or has been moved.
+    </div>
+    <a href="/" class="home-button">Go Home</a>
+  </div>
+</body>
+</html>
